@@ -100,7 +100,20 @@ con.connect((err) => {
                     console.error('Error creating talent_idea table:', err);
                     throw err;
                   }
-                  console.log('Table "talent_idea" created or exists');
+                  console.log('Table "talent_idea" created or exists');  
+
+                   con.query(`CREATE TABLE IF NOT EXISTS accepted_idea (
+                    ideaId VARCHAR(255),
+                    talentId VARCHAR(255),
+                    status boolean,
+                    rejectionReason TEXT
+                  )`, (err) => {
+                    if (err) {
+                      console.error('Error creating accepted_idea table:', err);
+                      throw err;
+                    }
+                    console.log('Table "accepted_idea" created or exists');
+                  });
                 });
               });
             });

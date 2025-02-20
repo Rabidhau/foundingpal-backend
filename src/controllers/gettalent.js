@@ -23,10 +23,10 @@ const getTalent = async (req, res) => {
     const appliedTalents = await query(selectQuery, [ideaId]);
 
     if (!appliedTalents || appliedTalents.length === 0) {
-      return res.status(404).json({ error: "Idea not found" });
+      return res.status(404).json({ error: "No talents found for this idea" });
     }
 
-    // Parse talentIDs properly (handling stringified arrays)
+    // Parse talentIDs properly
     let talentIDs = appliedTalents.map(row => {
       try {
         return JSON.parse(row.talentID); // Parse JSON string
@@ -39,9 +39,18 @@ const getTalent = async (req, res) => {
       return res.status(200).json({ talents: [] });
     }
 
-    // Fetch talent details (name and email) from talent_info table
-    const talentQuery = "SELECT name, email FROM talent_info WHERE id IN (?)";
-    const talentDetails = await query(talentQuery, [talentIDs]);
+    // Fetch talent details along with status from accepted_ideas
+    const talentQuery = `
+      SELECT 
+        t.id, 
+        t.name, 
+        t.email, 
+        COALESCE(a.status, NULL) AS status
+      FROM talent_info t
+      LEFT JOIN accepted_idea a ON t.id = a.talentId AND a.ideaId = ?
+      WHERE t.id IN (?)`;
+
+    const talentDetails = await query(talentQuery, [ideaId, talentIDs]);
 
     res.status(200).json({ talents: talentDetails });
   } catch (error) {
