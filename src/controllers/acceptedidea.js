@@ -9,7 +9,7 @@ const acceptedIdea = async (req, res) => {
     }
 
     // 🔹 Step 1: Get applied idea IDs & their status for the given user
-    const appliedQuery = "SELECT ideaId, status FROM accepted_idea WHERE talentId=?";
+    const appliedQuery = "SELECT ideaId, status,rejection_reason,user_comment,completion_percent FROM accepted_idea WHERE talentId=?";
     conn.query(appliedQuery, [userId], (err, appliedResults) => {
       if (err) {
         console.error("❌ Error fetching applied ideas:", err);
@@ -26,6 +26,19 @@ const acceptedIdea = async (req, res) => {
         ideaStatusMap.set(row.ideaId, row.status); // Store status for each ideaId
         return row.ideaId;
       });
+      const ideareasonMap = new Map();
+      appliedResults.forEach(row => {
+        ideareasonMap.set(row.ideaId, row.rejection_reason); // ✅ Corrected
+      });
+      const ideacommentMap = new Map();
+      appliedResults.forEach(row => {
+        ideacommentMap.set(row.ideaId, row.user_comment); // ✅ Corrected
+      });
+      const ideacompletionMap = new Map();
+      appliedResults.forEach(row => {
+        ideacompletionMap.set(row.ideaId, row.completion_percent); // ✅ Corrected
+      });
+      
 
       // 🔴 Handle empty ideaIDs case
       if (ideaIDs.length === 0) {
@@ -71,10 +84,12 @@ const acceptedIdea = async (req, res) => {
         // 🔹 Step 4: Attach the status from Step 1 to the final result
         const finalResult = result.map(idea => ({
           ...idea,
-          acceptedStatus: ideaStatusMap.get(idea.id), // Attach status from Map
+          acceptedStatus: ideaStatusMap.get(idea.id),
+          reason: ideareasonMap.get(idea.id), // ✅ Now correctly fetching reason
+          comment: ideacommentMap.get(idea.id),
+          completion: ideacompletionMap.get(idea.id),
+          
         }));
-
-
         res.status(200).json(finalResult);
       });
     });

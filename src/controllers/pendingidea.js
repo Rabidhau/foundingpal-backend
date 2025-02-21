@@ -67,8 +67,6 @@ const pendingIdea = async (req, res) => {
         if (result.length === 0) {
           return res.status(404).json({ message: "No matching ideas found" });
         }
-        
-        console.log("✅ Final Data:", JSON.stringify(result, null, 2));
         res.status(200).json(result);
       });
     });

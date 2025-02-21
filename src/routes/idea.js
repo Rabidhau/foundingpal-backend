@@ -12,6 +12,9 @@ const {getTalent} = require("../controllers/gettalent");
 const {insertTalent} = require("../controllers/updatetalent");
 const {pendingIdea} = require("../controllers/pendingidea");
 const {acceptedIdea} = require("../controllers/acceptedidea");
+const {acceptedUsers} = require("../controllers/accepteduser");
+const {commentIdea}= require("../controllers/commentidea");
+
 
 router.route("/create-idea").post(createIdea);
 router.route("/get-All-Idea").get(getAllIdea);
@@ -24,5 +27,7 @@ router.route("/get-talent/:id").get(getTalent);
 router.route("/update-talent-status").post(insertTalent);
 router.route("/get-pending-Idea").get(pendingIdea);
 router.route("/get-accepted-Idea").get(acceptedIdea);
+router.route("/get-accepted-Users").get(acceptedUsers);
+router.route("/comment-idea").put(commentIdea);
 
 module.exports = router;
