@@ -7,7 +7,7 @@ const logIn = async (req, res) => {
 try {
   const hashedPassword = md5Hash(password);
 
-  const sql = "SELECT userId, email, username, role FROM Users WHERE email=? AND password=?";
+  const sql = "SELECT userId, email, username, role,profile_image FROM Users WHERE email=? AND password=?";
   const values = [email, hashedPassword];
 
   conn.query(sql, values, (err, result) => {
