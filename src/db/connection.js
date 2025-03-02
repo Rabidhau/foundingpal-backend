@@ -92,15 +92,16 @@ con.connect((err) => {
                 }
                 console.log('Table "applied_idea" created or exists');
 
-                con.query(`CREATE TABLE IF NOT EXISTS talent_idea (
-                  talentId VARCHAR(255) PRIMARY KEY,
-                  idea_info TEXT  -- Consider renaming to something more descriptive, like "interested_ideas"
+                con.query(`CREATE TABLE IF NOT EXISTS user_friends (
+                  userId VARCHAR(255) NOT NULL,  
+                  friendId VARCHAR(255) NOT NULL,
+                  PRIMARY KEY (userID, friendID)      
                 )`, (err) => {
                   if (err) {
-                    console.error('Error creating talent_idea table:', err);
+                    console.error('Error creating user_friends table:', err);
                     throw err;
                   }
-                  console.log('Table "talent_idea" created or exists');  
+                  console.log('Table "user_friends" created or exists');
 
                    con.query(`CREATE TABLE IF NOT EXISTS accepted_idea (
                     ideaId VARCHAR(255),

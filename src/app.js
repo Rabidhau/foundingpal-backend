@@ -8,6 +8,7 @@ const errorMiddleware = require("./middleware/error-handler");
 const authRoute = require("./routes/auth");
 const ideaRoute = require("./routes/idea");
 const imageRoute = require("./routes/image");
+const userRoute = require("./routes/users");
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
 app.use("/", ideaRoute);
 app.use("/", authRoute);
 app.use("/", imageRoute); // Updated path for clarity
+app.use("/", userRoute);
 
 // Error Handling Middleware
 app.use(notFoundMiddleware);
