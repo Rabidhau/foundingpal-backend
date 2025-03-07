@@ -9,6 +9,7 @@ const authRoute = require("./routes/auth");
 const ideaRoute = require("./routes/idea");
 const imageRoute = require("./routes/image");
 const userRoute = require("./routes/users");
+const payRoute = require("./routes/payment");
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use("/", ideaRoute);
 app.use("/", authRoute);
 app.use("/", imageRoute); // Updated path for clarity
 app.use("/", userRoute);
+app.use("/", payRoute);
 
 // Error Handling Middleware
 app.use(notFoundMiddleware);

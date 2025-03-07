@@ -114,7 +114,57 @@ con.connect((err) => {
                       throw err;
                     }
                     console.log('Table "accepted_idea" created or exists');
+
+                    con.query(`CREATE TABLE IF NOT EXISTS paymentintegration (
+                      PaymentId VARCHAR(255) PRIMARY KEY,
+                      username VARCHAR(255),
+                      email VARCHAR(255),
+                      address VARCHAR(20),
+                      task TEXT,
+                      payment VARCHAR(50),
+                      amount VARCHAR(255),
+                      status VARCHAR(50) DEFAULT 'Pending'
+                )`, (err) => {
+                  if (err) {
+                      console.error('Error creating PaymentIntegration table:', err);
+                      throw err;
+                  }
+                  console.log('Table "PaymentIntegration" created or already exists');
+              
+
+                  con.query(`CREATE TABLE IF NOT EXISTS agreements (
+  id VARCHAR(255) PRIMARY KEY,
+  effectiveDate VARCHAR(255) ,
+  founderName VARCHAR(255) ,
+  founderAddress VARCHAR(255),
+  founderEmail VARCHAR(255) ,
+  collaboratorName VARCHAR(255) ,
+  collaboratorAddress VARCHAR(255) ,
+  collaboratorEmail VARCHAR(255) ,
+  projectTitle VARCHAR(255) ,
+  projectDescription TEXT,
+  founderResponsibilities TEXT,
+  collaboratorResponsibilities TEXT,
+  equityPercentage VARCHAR(255),
+  vestingSchedule VARCHAR(255),
+  terminationNotice VARCHAR(255) ,
+  founderSignature TEXT,
+  founderDate VARCHAR(255),
+  collaboratorSignature TEXT,
+  collaboratorDate VARCHAR(255),
+  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+              )`, (err) => {
+                if (err) {
+                    console.error('Error creating agreements table:', err);
+                    throw err;
+                }
+                console.log('Table "agreements" created or already exists');
+            
+              });
+                });
+
                   });
+
                 });
               });
             });

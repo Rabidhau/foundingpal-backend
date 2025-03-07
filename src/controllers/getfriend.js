@@ -36,7 +36,7 @@ const getFriend = async (req, res) => {
       }
 
       // Fetch user information for each friendId from the users table
-      const selectUserQuery = "SELECT userId, username,email,profile_image FROM Users WHERE userId IN (?)";
+      const selectUserQuery = "SELECT userId, username,email,profile_image,role FROM Users WHERE userId IN (?)";
       console.log("Executing query to fetch user details:", selectUserQuery, existingFriendIds);
 
       conn.query(selectUserQuery, [existingFriendIds], (selectUserErr, selectUserResult) => {

@@ -14,6 +14,8 @@ const {pendingIdea} = require("../controllers/pendingidea");
 const {acceptedIdea} = require("../controllers/acceptedidea");
 const {acceptedUsers} = require("../controllers/accepteduser");
 const {commentIdea}= require("../controllers/commentidea");
+const {get_agreement}= require("../controllers/getagreements");
+const {get_detail}= require("../controllers/getdetail");
 
 
 router.route("/create-idea").post(createIdea);
@@ -29,5 +31,7 @@ router.route("/get-pending-Idea").get(pendingIdea);
 router.route("/get-accepted-Idea").get(acceptedIdea);
 router.route("/get-accepted-Users").get(acceptedUsers);
 router.route("/comment-idea").put(commentIdea);
+router.route("/get-agreement").get(get_agreement);
+router.route("/get-detail/:id").get(get_detail);
 
 module.exports = router;
