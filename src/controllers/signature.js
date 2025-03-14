@@ -30,7 +30,7 @@ const handleSignatureUpload = (req, res) => {
   const imageUrl = `/signature/${req.file.filename}`; // Adjusted path
   const { userName, userRole, agreementId } = req.body; // Get agreementId
 
-  if (!userName || !userRole || !agreementId) {
+  if (!userName || !userRole) {
     return res.status(400).json({ success: false, message: "Missing required fields" });
   }
 

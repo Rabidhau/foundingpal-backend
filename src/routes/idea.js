@@ -16,7 +16,7 @@ const {acceptedUsers} = require("../controllers/accepteduser");
 const {commentIdea}= require("../controllers/commentidea");
 const {get_agreement}= require("../controllers/getagreements");
 const {get_detail}= require("../controllers/getdetail");
-
+const { deleteContract } = require("../controllers/deletecontract");
 
 router.route("/create-idea").post(createIdea);
 router.route("/get-All-Idea").get(getAllIdea);
@@ -33,5 +33,6 @@ router.route("/get-accepted-Users").get(acceptedUsers);
 router.route("/comment-idea").put(commentIdea);
 router.route("/get-agreement").get(get_agreement);
 router.route("/get-detail/:id").get(get_detail);
+router.delete("/contracts/:id", deleteContract);
 
 module.exports = router;
