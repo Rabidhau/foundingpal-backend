@@ -1,30 +1,42 @@
-const db = require("../db/connection");
-const { v4: uuidv4 } = require("uuid");
 
+const { v4: uuidv4 } = require("uuid");
+const db = require("../db/connection");
 
 exports.createRoom = (req, res) => {
   const { senderId, receiverId } = req.body;
 
-  if (!senderId || !receiverId) return res.status(400).json({ error: "Missing sender or receiver" });
+  if (!senderId || !receiverId) {
+    return res.status(400).json({ error: "Missing sender or receiver" });
+  }
 
-  // Check if chat already exists
-  const checkQuery = `SELECT * FROM chat_rooms WHERE (user1 = ? AND user2 = ?) OR (user1 = ? AND user2 = ?)`;
+  const roomId = uuidv4(); // Generate a unique room ID
 
-  db.query(checkQuery, [senderId, receiverId, receiverId, senderId], (err, results) => {
-    if (err) return res.status(500).json({ error: "Database error" });
+  // Atomic Insert: Ensure only one room is created
+  const createQuery = `
+    INSERT INTO chat_rooms (roomId, user1, user2)
+    SELECT * FROM (SELECT ? AS roomId, ? AS user1, ? AS user2) AS tmp
+    WHERE NOT EXISTS (
+        SELECT roomId FROM chat_rooms 
+        WHERE (user1 = ? AND user2 = ?) OR (user1 = ? AND user2 = ?)
+    ) LIMIT 1;
+  `;
 
-    if (results.length > 0) {
-      return res.json({ roomId: results[0].roomId }); // Return existing room
+  db.query(createQuery, [roomId, senderId, receiverId, senderId, receiverId, receiverId, senderId], (err, results) => {
+    if (err) {
+      console.error("Database error:", err);
+      return res.status(500).json({ error: "Database error" });
     }
 
-    // Create new room
-    const roomId = uuidv4();
-    const createQuery = `INSERT INTO chat_rooms (roomId, user1, user2) VALUES (?, ?, ?)`;
+    // Fetch the existing or newly created room ID
+    const getRoomQuery = `SELECT roomId FROM chat_rooms WHERE (user1 = ? AND user2 = ?) OR (user1 = ? AND user2 = ?) LIMIT 1`;
 
-    db.query(createQuery, [roomId, senderId, receiverId], (err) => {
-      if (err) return res.status(500).json({ error: "Database error" });
+    db.query(getRoomQuery, [senderId, receiverId, receiverId, senderId], (err, results) => {
+      if (err) {
+        console.error("Database error:", err);
+        return res.status(500).json({ error: "Database error" });
+      }
 
-      res.json({ roomId });
+      return res.json({ roomId: results[0].roomId });
     });
   });
 };

@@ -3,6 +3,7 @@ const router = express.Router();
 
 const { createIdea } = require("../controllers/createidea");
 const { getAllIdea } = require("../controllers/showAllidea");
+const { getAllcontracts } = require("../controllers/showAllcontracts");
 const { getIdeaById } = require("../controllers/showidea");
 const { applyIdea } = require("../controllers/applyidea");
 const { getActiveIdea } = require("../controllers/activeidea");
@@ -34,5 +35,6 @@ router.route("/comment-idea").put(commentIdea);
 router.route("/get-agreement").get(get_agreement);
 router.route("/get-detail/:id").get(get_detail);
 router.delete("/contracts/:id", deleteContract);
+router.route("/get-All-contract").get(getAllcontracts);
 
 module.exports = router;
