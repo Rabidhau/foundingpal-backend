@@ -44,7 +44,9 @@ const getTalent = async (req, res) => {
       SELECT 
         t.id, 
         t.name, 
-        t.email, 
+        t.email,
+        t.bio,
+        t.qualification, 
         COALESCE(a.status, NULL) AS status
       FROM talent_info t
       LEFT JOIN accepted_idea a ON t.id = a.talentId AND a.ideaId = ?

@@ -37,6 +37,9 @@ con.connect((err) => {
           email VARCHAR(255) NOT NULL,
           password VARCHAR(255) NOT NULL,
           role VARCHAR(255) NOT NULL,
+          profile_image VARCHAR(255),
+          bio TEXT,
+          qualifications TEXT,
           token VARCHAR(255) NOT NULL
         )`,
         (err) => {
@@ -85,7 +88,9 @@ con.connect((err) => {
                       id VARCHAR(255) NOT NULL PRIMARY KEY,
                       name VARCHAR(255) NOT NULL,
                       email VARCHAR(255),
-                      status BOOLEAN
+                      status BOOLEAN,
+                      bio TEXT,
+                      qualifications TEXT
                     )`,
                     (err) => {
                       if (err) {
