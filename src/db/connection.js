@@ -231,6 +231,31 @@ con.connect((err) => {
                                                     throw err;
                                                   }
                                                   console.log('Table "messages" created or exists');
+
+                                                  // 12. Create notifications table
+                                                  con.query(
+                                                    `CREATE TABLE  IF NOT EXISTS notifications (
+  id VARCHAR(255) PRIMARY KEY,
+  userId VARCHAR(255) NOT NULL,
+  type VARCHAR(50) NOT NULL DEFAULT 'message',
+  roomId VARCHAR(255),
+  senderId VARCHAR(255),
+  message TEXT,
+  isUnread BOOLEAN DEFAULT true,
+  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX (userId),
+  INDEX (isUnread)
+);`,
+                                                    (err) => {
+                                                      if (err) {
+                                                        console.error("Error creating notifications table:", err);
+                                                        throw err;
+                                                      }
+                                                      console.log('Table "notifications" created or exists');
+
+                                                      console.log("All tables created successfully");
+                                                    }
+                                                  );
                                                 }
                                               );
                                             }
