@@ -14,6 +14,7 @@ const payRoute = require("./routes/payment");
 
 const chatRoutes = require("./routes/chat");
 const messageRoutes = require("./routes/message");
+const notificationRoutes = require("./routes/notification");  
 
 const db = require("./db/connection");
 
@@ -37,6 +38,7 @@ app.use("/", userRoute);
 app.use("/", payRoute);
 app.use("/chat", chatRoutes);
 app.use("/messages", messageRoutes);
+app.use( notificationRoutes); // Added notification route
 
 // Error Handling Middleware
 app.use(notFoundMiddleware);

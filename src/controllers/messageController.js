@@ -30,35 +30,37 @@ exports.sendMessage = (req, res) => {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
-  const query = `
+  const messageQuery = `
     INSERT INTO messages (id, roomId, sender, receiver, message) 
     VALUES (?, ?, ?, ?, ?)
   `;
 
-  // Ensure receiverIds is an array (parse if it's a string)
-  let receivers = isGroup && typeof receiverIds === 'string' ? JSON.parse(receiverIds) : [receiverId];
+  const notificationQuery = `
+    INSERT INTO notifications (id, userId, type, roomId, senderId, message)
+    VALUES (?, ?, 'message', ?, ?, ?)
+  `;
 
-  if (isGroup) {
-    // For group chat, insert the message for each receiver in the group
-    receivers.forEach((receiver) => {
-      const messageId = uuidv4(); // Generate a new message ID for each receiver
-      db.query(query, [messageId, roomId, senderId, receiver, message], (err) => {
-        if (err) {
-          console.error("Database error:", err);
-          return res.status(500).json({ error: "Database error" });
+  // Ensure receiverIds is an array
+  const receivers = isGroup && typeof receiverIds === 'string' ? JSON.parse(receiverIds) : [receiverId];
+
+  receivers.forEach((receiver) => {
+    const messageId = uuidv4();
+    db.query(messageQuery, [messageId, roomId, senderId, receiver, message], (err) => {
+      if (err) {
+        console.error("Message insert error:", err);
+        return res.status(500).json({ error: "Database error inserting message" });
+      }
+
+      // Insert the notification after the message is inserted
+      const notificationId = uuidv4();
+      db.query(notificationQuery, [notificationId, receiver, roomId, senderId, message], (notifErr) => {
+        if (notifErr) {
+          console.error("Notification insert error:", notifErr);
+          return res.status(500).json({ error: "Database error inserting notification" });
         }
       });
     });
-  } else {
-    // For one-to-one chat, insert the message for the single receiver
-    const messageId = uuidv4(); // Generate a new message ID for one-to-one chat
-    db.query(query, [messageId, roomId, senderId, receiverId, message], (err) => {
-      if (err) {
-        console.error("Database error:", err);
-        return res.status(500).json({ error: "Database error" });
-      }
-    });
-  }
+  });
 
   // Respond with success after processing
   res.json({ success: true });
