@@ -8,7 +8,7 @@ const emailPassword = process.env.EMAIL_PASSWORD;
 
 let storedToken = null;
 
-const checkToken = async (token) => {
+const checkToken = async ( ) => {
   if (storedToken && storedToken.toString() === token.toString()) {
     return true;
   } 

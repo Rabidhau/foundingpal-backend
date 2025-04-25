@@ -53,7 +53,6 @@ const applyIdea = async (req, res) => {
         });
       }
     });
-    c
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Internal server error");
