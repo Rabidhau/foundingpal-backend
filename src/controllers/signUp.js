@@ -9,45 +9,68 @@ const md5Hash = (password) => {
   return hash.digest("hex");
 };
 
-const signUp = async (req, res) => {
+const signUp = (req, res) => {
   const { fullName, email, password, selectedOption, token } = req.body;
 
-  try {
-    // Validate password using regex
-    const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
-    if (!passwordRegex.test(password)) {
-      return res.status(400).send("Password does not meet complexity requirements");
-    }
-
-    // Generate userId using uuidv4
-    const userId = uuidv4();
-
-    // Hash the password
-    const hashedPassword = md5Hash(password);
-
-    const sqlUser = "INSERT INTO Users (userId, email, username, password, role,token) VALUES (?, ?, ?, ?, ?, ?)";
-    const valuesUser = [userId, email, fullName, hashedPassword, selectedOption,token];
-
-    // Execute query to insert user into Users table
-    await conn.query(sqlUser, valuesUser);
-
-    // If the role is talent, insert user info into talent_info table
-    if (selectedOption === "Talent") {
-      const sqltalent = "INSERT INTO talent_info (id, name, email) VALUES (?, ?, ?)";
-      const valuestalent = [userId, fullName, email];
-      await conn.query(sqltalent, valuestalent);
-    }
-    if (selectedOption === "Founder") {
-      const sqlFounder = "INSERT INTO founder_info (id, name, email) VALUES (?, ?, ?)";
-      const valuesFounder = [userId, fullName, email];
-      await conn.query(sqlFounder, valuesFounder);
-    }
-    console.log("Signup successful");
-    return res.status(200).send("Signup successful");
-  } catch (error) {
-    console.error("Error signing up:", error);
-    return res.status(500).send("Error signing up");
+  // Validate password
+  const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
+  if (!passwordRegex.test(password)) {
+    return res.status(400).json({ success: false, message: "Password does not meet complexity requirements" });
   }
-};
 
+  // First: check if email exists
+  const checkEmailSql = "SELECT email FROM Users WHERE email = ?";
+  conn.query(checkEmailSql, [email], (err, results) => {
+    if (err) {
+      console.error("Database error:", err);
+      return res.status(500).json({ success: false, message: "Database error", error: err.message });
+    }
+
+    if (results.length > 0) {
+      return res.status(400).json({ success: false, message: "Email already exists in the system" });
+    }
+
+    // Second: check if username exists
+    const checkUsernameSql = "SELECT username FROM Users WHERE username = ?";
+    conn.query(checkUsernameSql, [fullName], (err, results) => {
+      if (err) {
+        console.error("Database error:", err);
+        return res.status(500).json({ success: false, message: "Database error", error: err.message });
+      }
+
+      if (results.length > 0) {
+        return res.status(400).json({ success: false, message: "Username already exists in the system" });
+      }
+
+      // If both email and username are unique, proceed to insert
+      const userId = uuidv4();
+      const hashedPassword = md5Hash(password);
+
+      const insertUserSql = "INSERT INTO Users (userId, email, username, password, role, token) VALUES (?, ?, ?, ?, ?, ?)";
+      const userValues = [userId, email, fullName, hashedPassword, selectedOption, token];
+
+      conn.query(insertUserSql, userValues, (err) => {
+        if (err) {
+          console.error("Error inserting user:", err);
+          return res.status(500).json({ success: false, message: "Error signing up" });
+        }
+
+        // Insert into role-specific table
+        const roleSql = selectedOption === "Talent"
+          ? "INSERT INTO talent_info (id, name, email) VALUES (?, ?, ?)"
+          : "INSERT INTO founder_info (id, name, email) VALUES (?, ?, ?)";
+        const roleValues = [userId, fullName, email];
+
+        conn.query(roleSql, roleValues, (err) => {
+          if (err) {
+            console.error("Error inserting into role-specific table:", err);
+            return res.status(500).json({ success: false, message: "Error signing up" });
+          }
+
+          return res.status(200).json({ success: true, message: "Signup successful" });
+        });
+      });
+    });
+  });
+};
 module.exports = { signUp, md5Hash };
